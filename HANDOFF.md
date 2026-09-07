@@ -681,9 +681,43 @@
 
 #### Archivos tocados
 - `.github/workflows/deploy.yml` — workflow de despliegue automático de GitHub Actions.
-- `README.md` — enlace al juego en vivo en GitHub Pages.
-- `CLAUDE.md` — enlace al juego en vivo en GitHub Pages.
+- `walkthrough.md` — capturas y reporte visual del modelo de dos puertas.
+- `README.md` y `CLAUDE.md` — especificaciones técnicas y documentación de componentes.
 - `HANDOFF.md` — esta entrada (Entrada 13).
+
+---
+
+### Entrada 14 — 2026-09-06 — Implementación Integral del Tema Neobrutalista (Neo-Brutalism Pop Arcade)
+
+**Quién:** agente (Gemini 3.8 Flash Thinking), a petición del usuario
+
+#### Qué se hizo
+- **Rediseño Completo de la Interfaz (`style.css`)**:
+  - Se implementó un sistema de diseño **Neobrutalista** con paleta de alto impacto dominada por **rojo Coca-Cola (`#E1182C`), negro azabache (`#000000`), blanco puro (`#FFFFFF`) y amarillo pop (`#FFE600`)**.
+  - **Bordes y sombras duras**: Trazo sólido general de `3.5px` a `4.5px solid #000000` con sombras proyectadas en 90° sin desenfoque (`5px 5px 0px #000` a `12px 12px 0px #000`).
+  - **Sidebar lateral en rojo**: Fondo rojo Coca-Cola continuo con tarjetas modulares en blanco y negro, cronómetro digital de alto contraste con barra urgentemente pulsante y cajas de métricas tipo etiqueta industrial.
+  - **Botones táctiles**: Efecto de relieve físico y desplazamiento al hacer clic (`active: translate(3px, 3px); box-shadow: 2px 2px 0px #000`).
+  - **Modales Neobrutalistas**: Fondos crema suave (`#FFFDF7`), sellos tipo sticker amarillo/verde/cian, tarjetas de previsualización con marcos gruesos y tipografía ultra-bold grotesk.
+  - **Píldoras flotantes (+100 / -50)**: Convertidas en stickers de feedback táctico con rotación angular ligera y sombra dura.
+- **Verificación en Vivo**:
+  - Se probó en `http://localhost:8080/` con `browser_subagent` verificando el modal de inicio, la pantalla de juego con sidebar rojo, la respuesta de los botones de audio y el feedback interactivo.
+  - Documentación actualizada en `walkthrough.md`, `README.md` y `CLAUDE.md`.
+
+#### Qué se decidió y por qué
+- **Decisión:** Utilizar el sidebar en rojo Coca-Cola `#E1182C` con tarjetas de contenido en blanco y negro.
+  **Razón:** Maximiza el contraste y la energía del neobrutalismo, logrando una estética visual audaz y cohesiva que resalta inmediatamente el interior blanco del refrigerador.
+- **Decisión:** Mantener las sombras duras con desenfoque cero (`blur: 0`).
+  **Razón:** Es el sello de identidad indiscutible del neobrutalismo, otorgando a cada botón y tarjeta la apariencia física de una pieza tangible.
+
+#### Qué quedó pendiente
+- Ninguno. El tema neobrutalista se encuentra completamente implementado y verificado.
+
+#### Archivos tocados
+- `style.css` — reescritura con tokens y componentes neobrutalistas.
+- `walkthrough.md` — capturas y reporte visual del nuevo tema.
+- `README.md` y `CLAUDE.md` — actualización de especificaciones de UI.
+- `HANDOFF.md` — esta entrada (Entrada 14).
+
 
 
 

@@ -52,7 +52,7 @@ Al finalizar cada ronda y en el cierre global:
 ```
 ir_challenge/
 ├── index.html              ← Punto de entrada HTML (layout 28% sidebar / 72% cooler)
-├── style.css               ← Estilos corporate arcade, animaciones, tokens visuales
+├── style.css               ← Sistema de diseño Neobrutalista (rojo/negro/blanco, sombras duras, stickers)
 ├── game.js                 ← Motor de juego, lógica de hotspots, métricas CV y Web Audio API
 ├── hotspots.json           ← Coordenadas porcentuales y ground truth de las 4 rondas
 ├── build_fridges.py        ← Script generador de los 4 escenarios de refrigerador
