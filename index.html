@@ -19,9 +19,15 @@
         <span class="brand-version">v1.0 Corporate Arcade</span>
       </div>
       <div class="nav-controls">
-        <button id="btn-music" class="btn-icon" title="Pausar música de fondo" aria-label="Música de fondo">
-          <span id="music-icon">🎵</span>
-        </button>
+        <div class="music-player-bar" id="music-player-bar">
+          <button id="btn-music" class="btn-icon" title="Pausar música de fondo" aria-label="Música de fondo">
+            <span id="music-icon">🎵</span>
+          </button>
+          <button id="btn-music-next" class="btn-icon" title="Siguiente canción (Track siguiente)" aria-label="Siguiente canción">
+            ⏭️
+          </button>
+          <span id="music-track-title" class="music-track-pill" title="Click para cambiar de canción">TRACK 1: BOSS</span>
+        </div>
         <button id="btn-sound" class="btn-icon" title="Silenciar / Activar efectos de sonido" aria-label="Efectos de sonido">
           <span id="sound-icon">🔊</span>
         </button>

@@ -718,6 +718,41 @@
 - `README.md` y `CLAUDE.md` — actualización de especificaciones de UI.
 - `HANDOFF.md` — esta entrada (Entrada 14).
 
+---
+
+### Entrada 15 — 2026-09-06 — Soundtrack Multi-Track & Selector de Canción Siguiente (Next Track)
+
+**Quién:** agente (Gemini 3.8 Flash Thinking), a petición del usuario
+
+#### Qué se hizo
+- **Integración del Soundtrack Multi-Track (`game.js`)**:
+  - Se estructuró un array `PLAYLIST` con dos canciones completas de la experiencia:
+    1. `TRACK 1: BOSS` (`assets/audio/final_boss_battle.mp3` / `Final Boss Battle Version.mp3`)
+    2. `TRACK 2: ARCADE` (`assets/audio/playful_retro_arcade.mp3` / `Playful Retro Arcade Theme.mp3`)
+  - Se refactorizó la clase `MusicPlayer` para gestionar colecciones de pistas, índices circulares (`(currentIndex + 1) % length`), carga inmediata (`loadCurrentTrack`) y preservación del estado de reproducción/pausa entre cambios de pista.
+- **Controles de Audio Neobrutalistas en Top Nav (`index.html`, `style.css`)**:
+  - Se agregó el botón `btn-music-next` (`⏭️`) con estilo tactile neobrutalista y el badge interactivo `music-track-title` (`TRACK 1: BOSS` / `TRACK 2: ARCADE`).
+  - Tanto el botón `⏭️` como el badge de track cambian instantáneamente de pista al hacer clic, con feedback visual táctil y actualización inmediata del tooltip y la etiqueta.
+- **Verificación en Vivo con Navegador**:
+  - Se verificó en `http://localhost:8080/` con `browser_subagent`: el juego carga con `TRACK 1: BOSS`, al hacer clic en `⏭️` o en el badge cambia a `TRACK 2: ARCADE`, el audio reproduce sin interrupciones y el toggle de muteo sigue funcionando armoniosamente.
+
+#### Qué se decidió y por qué
+- **Decisión:** Permitir que tanto el botón `⏭️` como el badge tipo sticker `TRACK X` sean cliqueables.
+  **Razón:** Maximiza la facilidad de uso y la intuición para el usuario tanto en pantallas táctiles como en escritorio con mouse.
+- **Decisión:** Mantener el estado de reproducción actual al cambiar de pista (si estaba sonando, la nueva pista inicia de inmediato; si estaba en pausa, se carga la pista para cuando el usuario la reanude).
+  **Razón:** Respeta la intención explícita del usuario sin forzar reproducción si el jugador decidió pausarla.
+
+#### Qué quedó pendiente
+- Ninguno. El sistema de playlist y cambio de canción está 100% operativo y desplegado.
+
+#### Archivos tocados
+- `index.html` — adición del contenedor `music-player-bar`, botón `btn-music-next` y badge `music-track-title`.
+- `style.css` — estilos neobrutalistas para la barra de música y el badge de pista.
+- `game.js` — playlist multi-track en `MusicPlayer`, listeners y handlers de interfaz.
+- `README.md` y `CLAUDE.md` — documentación de la playlist y controles de audio.
+- `HANDOFF.md` — esta entrada (Entrada 15).
+
+
 
 
 

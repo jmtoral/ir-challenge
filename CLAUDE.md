@@ -58,6 +58,7 @@ ir_challenge/
 ├── build_fridges.py        ← Script generador de los 4 escenarios de refrigerador
 ├── packing_core.py         ← Motor de renderizado: marquesina roja, puertas dobles, parrillas de alambre y termostato (coca3.JPG)
 ├── assets/                 ← Recursos organizados y optimizados
+│   ├── audio/              ← Pistas de soundtrack (final_boss_battle, playful_retro_arcade)
 │   ├── cutouts/            ← Packshots y distractores con transparencia (beverages, groceries, parody)
 │   ├── fridges/            ← Escenarios finales renderizados de refrigeradores
 │   ├── raw/                ← Imágenes crudas de catálogo y referencia de enfriador

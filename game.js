@@ -114,21 +114,69 @@
     }
   }
 
-  // --- BACKGROUND MUSIC ENGINE ---
+  // --- BACKGROUND MUSIC ENGINE & PLAYLIST ---
+  const PLAYLIST = [
+    {
+      id: 'boss',
+      name: 'TRACK 1: BOSS',
+      fullName: 'Final Boss Battle',
+      src: 'assets/audio/final_boss_battle.mp3',
+      fallback: 'Final Boss Battle Version.mp3'
+    },
+    {
+      id: 'arcade',
+      name: 'TRACK 2: ARCADE',
+      fullName: 'Playful Retro Arcade',
+      src: 'assets/audio/playful_retro_arcade.mp3',
+      fallback: 'Playful Retro Arcade Theme.mp3'
+    }
+  ];
+
   class MusicPlayer {
-    constructor(src) {
-      this.audio = new Audio(src);
+    constructor(playlist) {
+      this.playlist = playlist;
+      this.currentIndex = 0;
+      this.isPausedByUser = false;
+      this.fallbackAttempted = false;
+
+      this.audio = new Audio(this.currentTrack.src);
       this.audio.loop = true;
       this.audio.volume = 0.35;
-      this.isPausedByUser = false;
 
+      this.setupAudioListeners();
+    }
+
+    get currentTrack() {
+      return this.playlist[this.currentIndex];
+    }
+
+    setupAudioListeners() {
       this.audio.addEventListener('error', () => {
-        if (!this.fallbackAttempted) {
+        if (!this.fallbackAttempted && this.currentTrack.fallback) {
           this.fallbackAttempted = true;
-          this.audio.src = 'Final Boss Battle Version.mp3';
+          this.audio.src = this.currentTrack.fallback;
           this.audio.load();
+          if (!this.isPausedByUser) {
+            this.audio.play().catch(() => {});
+          }
         }
       });
+    }
+
+    loadCurrentTrack(autoPlay = true) {
+      this.fallbackAttempted = false;
+      this.audio.src = this.currentTrack.src;
+      this.audio.load();
+      if (autoPlay && !this.isPausedByUser) {
+        this.play();
+      }
+    }
+
+    nextTrack() {
+      this.currentIndex = (this.currentIndex + 1) % this.playlist.length;
+      const wasPlaying = !this.audio.paused;
+      this.loadCurrentTrack(wasPlaying || !this.isPausedByUser);
+      return this.currentTrack;
     }
 
     play() {
@@ -178,7 +226,7 @@
   };
 
   const audio = new SoundEngine();
-  const music = new MusicPlayer('assets/audio/final_boss_battle.mp3');
+  const music = new MusicPlayer(PLAYLIST);
 
   // --- DOM ELEMENTS ---
   const $ = (id) => document.getElementById(id);
@@ -187,6 +235,8 @@
     app: $('app'),
     btnMusic: $('btn-music'),
     musicIcon: $('music-icon'),
+    btnMusicNext: $('btn-music-next'),
+    musicTrackTitle: $('music-track-title'),
     btnSound: $('btn-sound'),
     soundIcon: $('sound-icon'),
     btnRestartNav: $('btn-restart-nav'),
@@ -238,7 +288,15 @@
       console.error('Error cargando datos:', err);
     }
 
+    updateMusicTrackDisplay(music.currentTrack);
+    updateMusicButton(!music.audio.paused);
     setupEventListeners();
+  }
+
+  function updateMusicTrackDisplay(track) {
+    if (!el.musicTrackTitle || !track) return;
+    el.musicTrackTitle.textContent = track.name;
+    el.musicTrackTitle.title = `Pista actual: ${track.fullName} (Click para cambiar a la siguiente)`;
   }
 
   function updateMusicButton(isPlaying) {
@@ -260,6 +318,24 @@
       const isPlaying = music.toggle();
       updateMusicButton(isPlaying);
     });
+
+    if (el.btnMusicNext) {
+      el.btnMusicNext.addEventListener('click', () => {
+        audio.init();
+        const track = music.nextTrack();
+        updateMusicTrackDisplay(track);
+        updateMusicButton(!music.audio.paused);
+      });
+    }
+
+    if (el.musicTrackTitle) {
+      el.musicTrackTitle.addEventListener('click', () => {
+        audio.init();
+        const track = music.nextTrack();
+        updateMusicTrackDisplay(track);
+        updateMusicButton(!music.audio.paused);
+      });
+    }
 
     el.btnSound.addEventListener('click', () => {
       audio.init();
