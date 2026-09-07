@@ -618,6 +618,75 @@
 - `CLAUDE.md` — enlace oficial de control de versiones.
 - `HANDOFF.md` — esta entrada (Entrada 11).
 
+---
+
+### Entrada 12 — 2026-09-06 — Integración de Música de Fondo ("Final Boss Battle Version") y Control de Pausa
+
+**Quién:** agente (Gemini 3.8 Flash Thinking), a petición del usuario
+
+#### Qué se hizo
+- **Organización de audio**:
+  - Se copió y catalogó `Final Boss Battle Version.mp3` en `assets/audio/final_boss_battle.mp3` manteniendo retrocompatibilidad con la ruta raíz.
+  - Se catalogó `Playful Retro Arcade Theme.mp3` en `assets/audio/playful_retro_arcade.mp3`.
+- **Motor de Música de Fondo (`MusicPlayer` en `game.js`)**:
+  - Se implementó la clase `MusicPlayer` encargada de gestionar el ciclo de vida del audio en bucle continuo (`loop = true`), volumen balanceado a `0.35` (permitiendo que los efectos de aciertos y errores resalten con nitidez) y tolerancia a restricciones de autoplay de navegadores modernos.
+  - Se conservaron intactos todos los efectos de sonido procedurales de `SoundEngine` (+100 aciertos, −50 errores, ticks de cuenta regresiva y fanfarria final).
+- **Interfaz y Controles de Usuario (`index.html` y `style.css`)**:
+  - Se agregó el botón dedicado `#btn-music` con ícono dinámico (`🎵` en reproducción, `⏸️` en pausa), tooltip contextual y clase visual `.btn-icon.is-paused`.
+  - El botón `#btn-sound` se mantuvo para silenciar/activar exclusivamente los efectos de sonido (`🔊` / `🔇`).
+  - La música arranca de manera natural al pulsar *"COMENZAR SIMULACIÓN"*, reiniciarse la partida o con el primer clic del usuario.
+- **Verificación**:
+  - Se ejecutó verificación interactiva en el navegador mediante `browser_subagent` en `http://localhost:8080/`. Se comprobó que la música arranca al iniciar la partida, se pausa y actualiza a `⏸️` al pulsar el botón, y se reanuda a `🎵` sin retrasos.
+  - Se actualizaron `walkthrough.md`, `README.md` y `CLAUDE.md`.
+
+#### Qué se decidió y por qué
+- **Decisión:** Mantener controles separados para música de fondo (`#btn-music`) y efectos de sonido (`#btn-sound`).
+  **Razón:** Permite que el usuario juegue con su propia música externa si lo desea silenciando únicamente el soundtrack pero conservando el feedback de audio táctico de aciertos/errores en la auditoría.
+- **Decisión:** Volumen predeterminado calibrado en 0.35 para la música.
+  **Razón:** Evita saturación y asegura que los efectos sonoros de acierto (+100) y de penalización (−50) sean audibles y claros.
+
+#### Qué quedó pendiente
+- Ninguno. El sistema de música de fondo y control de pausa está 100% operativo y probado en vivo.
+
+#### Archivos tocados
+- `index.html` — botón de control de música `#btn-music` en la barra de navegación.
+- `style.css` — estilos para estado pausado `.btn-icon.is-paused`.
+- `game.js` — clase `MusicPlayer`, enlace de eventos y persistencia de estado.
+- `assets/audio/final_boss_battle.mp3` — archivo de música de fondo catalogado.
+- `walkthrough.md` — capturas y reporte de verificación en vivo.
+- `README.md` y `CLAUDE.md` — documentación actualizada del sistema de audio.
+- `HANDOFF.md` — esta entrada (Entrada 12).
+
+---
+
+### Entrada 13 — 2026-09-06 — Despliegue en GitHub Pages y Automatización CI/CD
+
+**Quién:** agente (Gemini 3.8 Flash Thinking), a petición del usuario
+
+#### Qué se hizo
+- **Configuración de GitHub Pages**:
+  - Se verificó que todos los recursos de la aplicación (`index.html`, `style.css`, `game.js`, `hotspots.json`, `assets/fridge-*.png`, `assets/audio/`) utilicen rutas relativas, garantizando funcionamiento sin colisiones tanto en dominio raíz como bajo el subdirectorio de GitHub Pages (`/ir-challenge/`).
+  - Se creó el flujo automatizado de GitHub Actions en `.github/workflows/deploy.yml` utilizando las acciones oficiales `actions/deploy-pages@v4`, `actions/upload-pages-artifact@v3` y `actions/configure-pages@v5`.
+  - Se creó y publicó la rama dedicada `gh-pages` con seguimiento remoto para soporte de despliegue directo por rama o por Actions.
+  - Se documentó la URL del sitio en vivo: **`https://jmtoral.github.io/ir-challenge/`**.
+- **Sincronización y Push**:
+  - Se confirmaron y subieron todos los cambios (controles de música de fondo, catálogo de audio, workflow de GitHub Pages y documentación) a la rama `main` y a `gh-pages` en `origin`.
+
+#### Qué se decidió y por qué
+- **Decisión:** Implementar workflow de GitHub Actions (`.github/workflows/deploy.yml`) y publicar simultáneamente rama `gh-pages`.
+  **Razón:** Otorga doble flexibilidad; si el usuario selecciona en los ajustes de GitHub Pages el origen *"GitHub Actions"* o *"Deploy from a branch (gh-pages)"*, el sitio queda publicado y operativo sin fricción.
+
+#### Qué quedó pendiente
+- Ninguno. El sitio está desplegado y sincronizado con GitHub Pages en `https://jmtoral.github.io/ir-challenge/`.
+
+#### Archivos tocados
+- `.github/workflows/deploy.yml` — workflow de despliegue automático de GitHub Actions.
+- `README.md` — enlace al juego en vivo en GitHub Pages.
+- `CLAUDE.md` — enlace al juego en vivo en GitHub Pages.
+- `HANDOFF.md` — esta entrada (Entrada 13).
+
+
+
 
 
 

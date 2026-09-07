@@ -2,7 +2,8 @@
 
 > **Spot it. Classify it. Beat the clock.**
 
-**Repositorio Oficial:** [github.com/jmtoral/ir-challenge](https://github.com/jmtoral/ir-challenge)
+- **Juego en Vivo (GitHub Pages):** [https://jmtoral.github.io/ir-challenge/](https://jmtoral.github.io/ir-challenge/)
+- **Repositorio Oficial:** [https://github.com/jmtoral/ir-challenge](https://github.com/jmtoral/ir-challenge)
 
 Un simulador interactivo tipo arcade corporativo diseñado para entrenar la agudeza visual de personal de campo en la auditoría de anaquel y refrigeradores comerciales de bebidas, conectando la experiencia de juego con métricas operacionales reales de **Computer Vision** / **Image Recognition (IR)**.
 
@@ -26,7 +27,9 @@ Un simulador interactivo tipo arcade corporativo diseñado para entrenar la agud
   - `Vision Operator` (Nivel auditor profesional).
   - `Sharp Observer` (Nivel intermedio).
   - `Shelf Scanner` (Nivel inicial).
-- **Audio Procedural Nativo:** Sintetizador de audio con Web Audio API (cero dependencias de red o archivos de audio externos) con botón de silenciar.
+- **Audio Arcade Completo & Música de Fondo:**
+  - **Música de fondo:** Pista de batalla arcade (*"Final Boss Battle Version"*) en bucle continuo a volumen calibrado con botón de pausa/reanudación dedicado (`btn-music` con ícono `🎵` / `⏸️`).
+  - **Efectos de sonido:** Síntesis Web Audio API procedural nativa para aciertos (+100), errores (−50), ticks de tiempo y fanfarria final con botón de silenciar independiente (`btn-sound` con ícono `🔊` / `🔇`).
 
 ---
 

@@ -1,6 +1,7 @@
 # CLAUDE.md — Instrucciones operativas para IMAGE RECOGNITION: THE GAME
 
-**Repositorio GitHub:** [https://github.com/jmtoral/ir-challenge](https://github.com/jmtoral/ir-challenge)
+- **Juego en Vivo (GitHub Pages):** [https://jmtoral.github.io/ir-challenge/](https://jmtoral.github.io/ir-challenge/)
+- **Repositorio GitHub:** [https://github.com/jmtoral/ir-challenge](https://github.com/jmtoral/ir-challenge)
 
 ## Qué es este proyecto
 
@@ -94,8 +95,9 @@ Abrir en navegador moderno en: **`http://localhost:8080/`** (optimizado para res
 2. **Bitácora `HANDOFF.md`**:
    - **Regla estricta:** Al finalizar cada sesión se agrega una nueva entrada al final (`Entrada N`). Nunca se modifican ni eliminan entradas anteriores.
    - Toda decisión tomada o rechazada debe quedar registrada con su justificación.
-3. **Audio nativo**:
-   - Se utiliza Web Audio API sin dependencias externas para garantizar funcionamiento offline y carga instantánea.
+3. **Sistema de Audio y Música**:
+   - Efectos de sonido procedurales mediante Web Audio API (cero dependencias externas para respuestas instantáneas).
+   - Música de fondo mediante `MusicPlayer` (`assets/audio/final_boss_battle.mp3`) con botón dedicado de pausa/reanudación (`#btn-music`) y volumen calibrado (0.35).
 4. **Regeneración de escenarios con Python**:
    - Entorno Conda con OpenCV y Pillow: `conda activate computer_vision` -> `python build_fridges.py`.
 5. **Permisos y comandos en el IDE**:

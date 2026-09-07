@@ -108,6 +108,12 @@ html, body {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.btn-icon.is-paused {
+  opacity: 0.6;
+  filter: grayscale(0.8);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 /* MAIN LAYOUT (28% SIDEBAR / 72% VIEWPORT) */
 .main-layout {
   display: flex;

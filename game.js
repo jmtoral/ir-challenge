@@ -114,6 +114,49 @@
     }
   }
 
+  // --- BACKGROUND MUSIC ENGINE ---
+  class MusicPlayer {
+    constructor(src) {
+      this.audio = new Audio(src);
+      this.audio.loop = true;
+      this.audio.volume = 0.35;
+      this.isPausedByUser = false;
+
+      this.audio.addEventListener('error', () => {
+        if (!this.fallbackAttempted) {
+          this.fallbackAttempted = true;
+          this.audio.src = 'Final Boss Battle Version.mp3';
+          this.audio.load();
+        }
+      });
+    }
+
+    play() {
+      if (this.isPausedByUser) return;
+      const promise = this.audio.play();
+      if (promise !== undefined) {
+        promise.catch((err) => {
+          console.log('Background music deferred until interaction:', err);
+        });
+      }
+    }
+
+    pause() {
+      this.audio.pause();
+    }
+
+    toggle() {
+      if (this.audio.paused) {
+        this.isPausedByUser = false;
+        this.play();
+      } else {
+        this.isPausedByUser = true;
+        this.pause();
+      }
+      return !this.audio.paused;
+    }
+  }
+
   // --- GAME STATE ---
   const state = {
     rounds: [],
@@ -135,12 +178,15 @@
   };
 
   const audio = new SoundEngine();
+  const music = new MusicPlayer('assets/audio/final_boss_battle.mp3');
 
   // --- DOM ELEMENTS ---
   const $ = (id) => document.getElementById(id);
 
   const el = {
     app: $('app'),
+    btnMusic: $('btn-music'),
+    musicIcon: $('music-icon'),
     btnSound: $('btn-sound'),
     soundIcon: $('sound-icon'),
     btnRestartNav: $('btn-restart-nav'),
@@ -195,26 +241,52 @@
     setupEventListeners();
   }
 
+  function updateMusicButton(isPlaying) {
+    if (!el.btnMusic || !el.musicIcon) return;
+    if (isPlaying) {
+      el.musicIcon.textContent = '🎵';
+      el.btnMusic.title = 'Pausar música de fondo';
+      el.btnMusic.classList.remove('is-paused');
+    } else {
+      el.musicIcon.textContent = '⏸️';
+      el.btnMusic.title = 'Reanudar música de fondo';
+      el.btnMusic.classList.add('is-paused');
+    }
+  }
+
   function setupEventListeners() {
+    el.btnMusic.addEventListener('click', () => {
+      audio.init();
+      const isPlaying = music.toggle();
+      updateMusicButton(isPlaying);
+    });
+
     el.btnSound.addEventListener('click', () => {
       audio.init();
       const enabled = audio.toggle();
       el.soundIcon.textContent = enabled ? '🔊' : '🔇';
+      el.btnSound.title = enabled ? 'Silenciar efectos de sonido' : 'Activar efectos de sonido';
     });
 
     el.btnRestartNav.addEventListener('click', () => {
       audio.init();
+      music.play();
+      updateMusicButton(!music.audio.paused);
       resetGame();
     });
 
     el.btnStartGame.addEventListener('click', () => {
       audio.init();
+      music.play();
+      updateMusicButton(!music.audio.paused);
       el.modalStart.classList.add('hidden');
       startRound(0);
     });
 
     el.btnNextRound.addEventListener('click', () => {
       audio.init();
+      music.play();
+      updateMusicButton(!music.audio.paused);
       el.modalRoundResults.classList.add('hidden');
       if (state.currentRoundIndex + 1 < state.rounds.length) {
         startRound(state.currentRoundIndex + 1);
@@ -225,10 +297,21 @@
 
     el.btnPlayAgain.addEventListener('click', () => {
       audio.init();
+      music.play();
+      updateMusicButton(!music.audio.paused);
       el.modalFinalBenchmark.classList.add('hidden');
       resetGame();
       startRound(0);
     });
+
+    // Desbloquear audio e iniciar música en primera interacción de usuario
+    document.addEventListener('click', () => {
+      audio.init();
+      if (!music.isPausedByUser && music.audio.paused) {
+        music.play();
+        updateMusicButton(true);
+      }
+    }, { once: true });
   }
 
   function resetGame() {
