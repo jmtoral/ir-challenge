@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMAGE RECOGNITION: THE GAME</title>
+  <meta name="description" content="Simulador interactivo de reconocimiento visual en anaquel y enfriadores de bebidas con métricas de Computer Vision.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container" id="app">
+    <!-- Top Bar for mobile/small screen header & controls -->
+    <header class="top-nav">
+      <div class="brand-badge">
+        <span class="brand-pill">IR SIMULATOR</span>
+        <span class="brand-version">v1.0 Corporate Arcade</span>
+      </div>
+      <div class="nav-controls">
+        <button id="btn-sound" class="btn-icon" title="Silenciar / Activar sonido" aria-label="Sonido">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="btn-restart-nav" class="btn-icon" title="Reiniciar juego" aria-label="Reiniciar">
+          🔄
+        </button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <!-- PANEL IZQUIERDO: 28% -->
+      <aside class="sidebar-panel">
+        <div class="brand-header">
+          <div class="tech-tag">IMAGE RECOGNITION:</div>
+          <h1 class="main-title">THE GAME</h1>
+          <p class="tagline">Spot it. Classify it. Beat the clock.</p>
+        </div>
+
+        <!-- TARJETA DE MISIÓN -->
+        <div class="card mission-card" id="mission-card">
+          <div class="mission-header">
+            <span class="mission-badge" id="mission-badge">MISIÓN</span>
+            <span class="round-indicator" id="round-indicator">RONDA 1 / 4</span>
+          </div>
+          <h2 class="mission-text" id="mission-text">Encuentra todas las Coca-Cola Original</h2>
+          <p class="mission-subtext" id="mission-subtext">Busca las botellas con etiqueta roja clásica Coca-Cola Original.</p>
+        </div>
+
+        <!-- TARJETA DE ESTADÍSTICAS EN TIEMPO REAL -->
+        <div class="card stats-card">
+          <!-- CRONÓMETRO -->
+          <div class="stat-group">
+            <div class="stat-label-row">
+              <span class="stat-label">TIEMPO RESTANTE</span>
+              <span class="stat-value-highlight" id="timer-display">10.0 s</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-bar" id="timer-bar" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- SCORE & ENCONTRADOS -->
+          <div class="stat-grid">
+            <div class="stat-box">
+              <span class="stat-label">PUNTUACIÓN</span>
+              <span class="stat-number" id="score-display">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">ENCONTRADOS</span>
+              <span class="stat-number stat-found" id="found-display">0 / 4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- REGLAS RÁPIDAS -->
+        <div class="card rules-card">
+          <div class="rules-header">REGLAS DE CLASIFICACIÓN</div>
+          <ul class="rules-list">
+            <li><span class="bullet green">●</span> Haz clic sobre los productos correctos (+100 pts).</li>
+            <li><span class="bullet red">●</span> Los falsos positivos restan puntos (−50 pts).</li>
+            <li><span class="bullet yellow">●</span> Encuentra todos antes de que termine el tiempo.</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- ÁREA PRINCIPAL: REFRIGERADOR (72%) -->
+      <main class="viewport-panel" id="viewport-panel">
+        <div class="stage-frame" id="stage-frame">
+          <!-- Contenedor ajustado exactamente a la imagen -->
+          <div class="cooler-container" id="cooler-container">
+            <img id="fridge-img" class="fridge-image" src="assets/fridge-01.png" alt="Escenario Refrigerador Comercial" draggable="false">
+            <!-- Capa interactiva SVG/HTML para hotspots -->
+            <div class="hotspots-overlay" id="hotspots-overlay"></div>
+            <!-- Capa de feedback flotante (+100 / -50) -->
+            <div class="feedback-overlay" id="feedback-overlay"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- PANTALLA INICIAL MODAL -->
+    <div class="modal-overlay" id="modal-start">
+      <div class="modal-card start-modal-card">
+        <div class="modal-badge">COMPUTER VISION OPERATIONAL AUDIT</div>
+        <h2 class="modal-title">IMAGE RECOGNITION: THE GAME</h2>
+        <p class="modal-tagline">Spot it. Classify it. Beat the clock.</p>
+        <div class="modal-divider"></div>
+        <p class="modal-desc">
+          Entrena tu ojo frente a refrigeradores de tienditas abarrotadas. Identifica variantes de portafolio y empaques bajo presión de tiempo con métricas de <strong>Precision</strong> y <strong>Recall</strong> reales. ¡Cuidado con el <strong>Queso Oaxaca, Tuppers, Pollo Rostizado</strong> y refrescos pirata como <strong>Devil's Cola</strong> y <strong>Pecsi</strong>!
+        </p>
+        <div class="round-preview-grid">
+          <div class="preview-item">
+            <span class="preview-num">01</span>
+            <strong>Ronda 1</strong>
+            <span>Tiendita de Barrio</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-num">02</span>
+            <strong>Ronda 2</strong>
+            <span>Guerra de Colas</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-num">03</span>
+            <strong>Ronda 3</strong>
+            <span>Desmadre en Anaquel</span>
+          </div>
+          <div class="preview-item alert">
+            <span class="preview-num">04</span>
+            <strong>Ronda 4</strong>
+            <span>Tiendita Extrema</span>
+          </div>
+        </div>
+        <button id="btn-start-game" class="btn-primary">INICIAR OPERACIÓN</button>
+      </div>
+    </div>
+
+    <!-- PANTALLA DE RESULTADOS DE RONDA MODAL -->
+    <div class="modal-overlay hidden" id="modal-round-results">
+      <div class="modal-card results-modal-card">
+        <div class="modal-badge-success" id="round-result-badge">RONDA COMPLETADA</div>
+        <h2 class="modal-title" id="round-result-title">MÉTRICAS DE VISIÓN</h2>
+        <p class="modal-sub" id="round-result-sub">Desempeño de reconocimiento visual en esta ronda</p>
+
+        <div class="metrics-grid">
+          <div class="metric-box">
+            <span class="metric-label">PRECISION</span>
+            <span class="metric-formula">TP / (TP + FP)</span>
+            <span class="metric-value" id="metric-precision">0.0%</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">RECALL</span>
+            <span class="metric-formula">TP / (TP + FN)</span>
+            <span class="metric-value" id="metric-recall">0.0%</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">ACCURACY</span>
+            <span class="metric-formula">Exactitud Global</span>
+            <span class="metric-value" id="metric-accuracy">0.0%</span>
+          </div>
+        </div>
+
+        <div class="breakdown-list">
+          <div class="breakdown-row">
+            <span>Aciertos (True Positives):</span>
+            <strong class="text-green" id="stat-tp">0</strong>
+          </div>
+          <div class="breakdown-row">
+            <span>Falsos Positivos (False Positives):</span>
+            <strong class="text-red" id="stat-fp">0</strong>
+          </div>
+          <div class="breakdown-row">
+            <span>Objetivos Omitidos (False Negatives):</span>
+            <strong class="text-yellow" id="stat-fn">0</strong>
+          </div>
+          <div class="breakdown-row">
+            <span>Bonus de Tiempo Restante:</span>
+            <strong class="text-cyan" id="stat-time-bonus">+0 pts</strong>
+          </div>
+          <div class="breakdown-row total-row">
+            <span>Puntuación Acumulada:</span>
+            <strong class="text-white" id="stat-round-score">0 pts</strong>
+          </div>
+        </div>
+
+        <button id="btn-next-round" class="btn-primary">CONTINUAR A LA SIGUIENTE RONDA</button>
+      </div>
+    </div>
+
+    <!-- PANTALLA FINAL: HUMAN VISION BENCHMARK -->
+    <div class="modal-overlay hidden" id="modal-final-benchmark">
+      <div class="modal-card benchmark-modal-card">
+        <div class="modal-badge-benchmark">AUDITORÍA FINAL CONCLUIDA</div>
+        <h2 class="modal-title-benchmark">HUMAN VISION BENCHMARK</h2>
+        <div class="rank-container">
+          <span class="rank-label">CLASIFICACIÓN ASIGNADA</span>
+          <h3 class="rank-title" id="final-rank-title">HUMAN VISION ENGINE</h3>
+          <span class="rank-desc" id="final-rank-desc">Rendimiento superior en reconocimiento de anaquel.</span>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-box highlight">
+            <span class="metric-label">PRECISION GLOBAL</span>
+            <span class="metric-value" id="final-precision">0.0%</span>
+          </div>
+          <div class="metric-box highlight">
+            <span class="metric-label">RECALL GLOBAL</span>
+            <span class="metric-value" id="final-recall">0.0%</span>
+          </div>
+          <div class="metric-box highlight">
+            <span class="metric-label">ACCURACY GLOBAL</span>
+            <span class="metric-value" id="final-accuracy">0.0%</span>
+          </div>
+        </div>
+
+        <div class="final-score-box">
+          <span class="final-score-label">SCORE TOTAL ACUMULADO</span>
+          <span class="final-score-number" id="final-total-score">0</span>
+        </div>
+
+        <blockquote class="benchmark-quote">
+          “Ver Coca-Cola era fácil. Identificar correctamente producto, variante y empaque bajo presión fue el verdadero problema.”
+        </blockquote>
+
+        <button id="btn-play-again" class="btn-primary">JUGAR DE NUEVO</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

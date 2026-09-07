@@ -1,0 +1,358 @@
+{
+  "version": 1,
+  "generated": "2026-09-04T00:00:00Z",
+  "notes": "Corpus mixto: 16 fotos originales del catálogo de producto + 12 generadas por IA. Las generadas se marcan con ai_generated:true. Los nombres siguen convención marca-sabor-tamaño-envase.",
+  "images": [
+    {
+      "file": "asset_ir_challenge/ameyal-sabor-fresa-kiwi-2-l.png",
+      "brand": "Ameyal",
+      "sku": null,
+      "tags": ["fresa-kiwi", "2l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/ameyal-sabor-limon-600ml-pet.jpg",
+      "brand": "Ameyal",
+      "sku": null,
+      "tags": ["limon", "600ml", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/ameyal-sabor-mango-1500ml-pet.jpg",
+      "brand": "Ameyal",
+      "sku": null,
+      "tags": ["mango", "1500ml", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/ameyal-sabor-naranja-600ml-pet.jpg",
+      "brand": "Ameyal",
+      "sku": null,
+      "tags": ["naranja", "600ml", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/ameyal-sabor-sandia-2l-pet.jpg",
+      "brand": "Ameyal",
+      "sku": null,
+      "tags": ["sandia", "2l", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/ameyal-sabor-uva-2l-pet.jpg",
+      "brand": "Ameyal",
+      "sku": null,
+      "tags": ["uva", "2l", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/coca-cola-original-235ml-vidrio.png",
+      "brand": "Coca-Cola",
+      "sku": null,
+      "tags": ["original", "235ml", "vidrio"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/coca-cola-original-250-ml-pet.png",
+      "brand": "Coca-Cola",
+      "sku": null,
+      "tags": ["original", "250ml", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/coca-cola-sin-azucar-235-ml.png",
+      "brand": "Coca-Cola",
+      "sku": null,
+      "tags": ["sin-azucar", "235ml"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/coca_light_1.25_pnr_1__1.webp",
+      "brand": "Coca-Cola",
+      "sku": null,
+      "tags": ["light", "1.25l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": true,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/coccollig-ligh-nor-pet-2.5l-2.webp",
+      "brand": "Coca-Cola",
+      "sku": null,
+      "tags": ["light", "2.5l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": true,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/coccolsinazu-sinazuc-nor-alu-235ml-8pz_3.webp",
+      "brand": "Coca-Cola",
+      "sku": null,
+      "tags": ["sin-azucar", "235ml", "aluminio", "8pack"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": true,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/coccolsinazu-sinazuc-nor-pet-3l.webp",
+      "brand": "Coca-Cola",
+      "sku": null,
+      "tags": ["sin-azucar", "3l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": true,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/fanta-sabor-fresa-1-5-l-pet.png",
+      "brand": "Fanta",
+      "sku": null,
+      "tags": ["fresa", "1.5l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/fanta-sabor-naranja-1-5-l-pet.png",
+      "brand": "Fanta",
+      "sku": null,
+      "tags": ["naranja", "1.5l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/fre-toro-nor-pet-2.5l.webp",
+      "brand": "Fresca",
+      "sku": null,
+      "tags": ["toronja", "2.5l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": true,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/frefus-toro-nor-pet-2l.webp",
+      "brand": "Fresca",
+      "sku": null,
+      "tags": ["toronja", "2l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": true,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sidral-mundet-fresa-kiwi-2l.png",
+      "brand": "Sidral Mundet",
+      "sku": null,
+      "tags": ["fresa-kiwi", "2l", "pet"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sidral-mundet-manzana-600ml-pet.jpg",
+      "brand": "Sidral Mundet",
+      "sku": null,
+      "tags": ["manzana", "600ml", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sidral-mundet-manzana-2l-pet.jpg",
+      "brand": "Sidral Mundet",
+      "sku": null,
+      "tags": ["manzana", "2l", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sidral-mundet-manzana-355ml-lata.jpg",
+      "brand": "Sidral Mundet",
+      "sku": null,
+      "tags": ["manzana", "355ml", "lata"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sidral-mundet-manzana-1500ml-pet.jpg",
+      "brand": "Sidral Mundet",
+      "sku": null,
+      "tags": ["manzana", "1500ml", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sidral-mundet-manzana-verde-600ml-pet.jpg",
+      "brand": "Sidral Mundet",
+      "sku": null,
+      "tags": ["manzana-verde", "600ml", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sprite-limon-lima-600ml-pet.jpg",
+      "brand": "Sprite",
+      "sku": null,
+      "tags": ["limon-lima", "600ml", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sprite-limon-lima-2l-pet.jpg",
+      "brand": "Sprite",
+      "sku": null,
+      "tags": ["limon-lima", "2l", "pet"],
+      "ai_generated": true,
+      "difficulty_hints": {
+        "low_res": false,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/sprite_355ml_12_lata-100-parent_1.webp",
+      "brand": "Sprite",
+      "sku": null,
+      "tags": ["355ml", "lata", "12pack"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": true,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    },
+    {
+      "file": "asset_ir_challenge/spritesindetalles_1.webp",
+      "brand": "Sprite",
+      "sku": null,
+      "tags": ["sin-detalles"],
+      "ai_generated": false,
+      "difficulty_hints": {
+        "low_res": true,
+        "partial_crop": false,
+        "occluded": false,
+        "rotated": false
+      }
+    }
+  ]
+}

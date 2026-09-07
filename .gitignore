@@ -1,0 +1,36 @@
+# IR Challenge
+
+# Dependencias / node
+node_modules/
+package-lock.json
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+._*
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.venv
+env/
+venv/
+
+# Generados por el juego o por scripts de build
+dist/
+build/
+*.min.js
+*.min.css
+
+# No ignorar las imágenes del corpus: son el asset del proyecto.
+# No ignorar manifest.json: es fuente de verdad del catálogo.
