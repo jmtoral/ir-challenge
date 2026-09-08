@@ -1,7 +1,10 @@
 import os
+import sys
 import json
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from packing_core import create_cooler_base, apply_glass_and_reflections, pack_shelf, WIDTH, HEIGHT, ASSETS_DIR, OUT_DIR, FRIDGES_DIR
 
 def generate_all():

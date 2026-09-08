@@ -53,16 +53,26 @@ Al finalizar cada ronda y en el cierre global:
 ir_challenge/
 ├── index.html              ← Punto de entrada HTML (layout 28% sidebar / 72% cooler)
 ├── style.css               ← Sistema de diseño Neobrutalista (rojo/negro/blanco, sombras duras, stickers)
-├── game.js                 ← Motor de juego, lógica de hotspots, métricas CV y Web Audio API
+├── game.js                 ← Motor de juego, cuenta regresiva 3s, hotspots, leaderboard y Web Audio API
 ├── hotspots.json           ← Coordenadas porcentuales y ground truth de las 4 rondas
-├── build_fridges.py        ← Script generador de los 4 escenarios de refrigerador
-├── packing_core.py         ← Motor de renderizado: marquesina roja, puertas dobles, parrillas de alambre y termostato (coca3.JPG)
+├── manifest.json           ← Manifiesto de la aplicación web
 ├── assets/                 ← Recursos organizados y optimizados
 │   ├── audio/              ← Pistas de soundtrack (final_boss_battle, playful_retro_arcade)
 │   ├── cutouts/            ← Packshots y distractores con transparencia (beverages, groceries, parody)
 │   ├── fridges/            ← Escenarios finales renderizados de refrigeradores
-│   ├── raw/                ← Imágenes crudas de catálogo y referencia de enfriador
+│   ├── raw/                ← Imágenes crudas de catálogo y referencia de enfriador (coca3.jpg)
+│   ├── archive/            ← Archivo histórico de assets crudos y transparentes
 │   └── fridge-01.png..04   ← Enlaces raíz retrocompatibles
+├── scripts/                ← Scripts generadores y utilerías de Computer Vision
+│   ├── build_fridges.py    ← Generador de los 4 escenarios de refrigerador
+│   ├── packing_core.py     ← Motor de renderizado: marquesina, puertas dobles, parrillas
+│   ├── fix_distractors_grabcut.py ← Limpieza de máscaras con GrabCut
+│   ├── process_distractors.py     ← Procesamiento de distractores
+│   └── organize_assets.py  ← Clasificación y organización de assets
+├── server/                 ← Backend de Leaderboard Global (Cloudflare Workers + KV)
+│   ├── worker.js           ← Código del Worker para API REST (/api/leaderboard, /api/score)
+│   ├── wrangler.toml       ← Configuración de despliegue Cloudflare
+│   └── README.md           ← Guía paso a paso para despliegue
 ├── CLAUDE.md               ← Este archivo de instrucciones operativas
 ├── README.md               ← Documentación general del proyecto y guía de uso
 ├── HANDOFF.md              ← Bitácora cronológica inmutable de sesiones de trabajo

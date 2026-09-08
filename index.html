@@ -31,6 +31,9 @@
         <button id="btn-sound" class="btn-icon" title="Silenciar / Activar efectos de sonido" aria-label="Efectos de sonido">
           <span id="sound-icon">🔊</span>
         </button>
+        <button id="btn-leaderboard-nav" class="btn-icon btn-leaderboard-nav" title="Ver Leaderboard Global" aria-label="Ranking Global">
+          🏆 RANKING
+        </button>
         <button id="btn-restart-nav" class="btn-icon" title="Reiniciar juego" aria-label="Reiniciar">
           🔄
         </button>
@@ -103,6 +106,25 @@
             <div class="hotspots-overlay" id="hotspots-overlay"></div>
             <!-- Capa de feedback flotante (+100 / -50) -->
             <div class="feedback-overlay" id="feedback-overlay"></div>
+
+            <!-- OVERLAY DE CUENTA REGRESIVA DE 3 SEGUNDOS (PREPARACIÓN DE RONDA) -->
+            <div class="countdown-overlay hidden" id="countdown-overlay">
+              <div class="countdown-card">
+                <div class="countdown-badge" id="countdown-round-badge">RONDA 1 // PREPARACIÓN</div>
+                <div class="countdown-mission-box">
+                  <div class="countdown-mission-label">MISIÓN DE AUDITORÍA:</div>
+                  <h3 class="countdown-mission-title" id="countdown-mission-title">Encuentra todas las Coca-Cola Original</h3>
+                  <p class="countdown-mission-desc" id="countdown-mission-desc">Busca las botellas con etiqueta roja clásica Coca-Cola Original.</p>
+                </div>
+                <div class="countdown-timer-circle" id="countdown-timer-circle">
+                  <span class="countdown-number" id="countdown-number">3</span>
+                </div>
+                <div class="countdown-subtext" id="countdown-subtext">INICIANDO EN BREVE...</div>
+                <button type="button" class="btn-skip-countdown" id="btn-skip-countdown" title="Saltar cuenta regresiva (o presiona Espacio)">
+                  SALTAR [ESPACIO] ⏩
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -138,6 +160,14 @@
             <span class="preview-num">04</span>
             <strong>Ronda 4</strong>
             <span>Tiendita Extrema</span>
+          </div>
+        </div>
+
+        <div class="player-name-field">
+          <label for="input-player-name" class="player-name-label">NOMBRE // ALIAS DE AUDITOR:</label>
+          <div class="player-name-input-row">
+            <input type="text" id="input-player-name" class="input-neobrutalist" placeholder="Auditor Pop" maxlength="20" autocomplete="off" spellcheck="false" />
+            <button id="btn-view-lb-start" class="btn-icon btn-lb-trigger" type="button" title="Ver ranking global">🏆 RANKING</button>
           </div>
         </div>
         <button id="btn-start-game" class="btn-primary">INICIAR OPERACIÓN</button>
@@ -231,7 +261,39 @@
           “Ver Coca-Cola era fácil. Identificar correctamente producto, variante y empaque bajo presión fue el verdadero problema.”
         </blockquote>
 
+        <!-- SECCIÓN LEADERBOARD EN PANTALLA FINAL -->
+        <div class="benchmark-leaderboard-section">
+          <div class="benchmark-leaderboard-header">
+            <span class="benchmark-leaderboard-badge">🏆 TOP 10 GLOBAL AUDIT RANKING</span>
+            <span id="benchmark-lb-status" class="lb-status-pill">OFFLINE / LOCAL</span>
+          </div>
+          <div id="benchmark-leaderboard-container" class="leaderboard-table-wrapper">
+            <!-- Tabla renderizada dinámicamente -->
+          </div>
+        </div>
+
         <button id="btn-play-again" class="btn-primary">JUGAR DE NUEVO</button>
+      </div>
+    </div>
+
+    <!-- MODAL DE LEADERBOARD GLOBAL -->
+    <div class="modal-overlay hidden" id="modal-leaderboard">
+      <div class="modal-card leaderboard-modal-card">
+        <div class="modal-badge-leaderboard">
+          <span>🏆 GLOBAL AUDIT RANKING</span>
+          <span id="modal-lb-status" class="lb-status-pill">LOCAL</span>
+        </div>
+        <h2 class="modal-title">TOP 10 AUDITORES</h2>
+        <p class="modal-sub">Mejores puntuaciones y precisión de reconocimiento visual</p>
+        
+        <div id="global-leaderboard-container" class="leaderboard-table-wrapper">
+          <!-- Renderizado dinámico -->
+        </div>
+
+        <div class="modal-actions-row">
+          <button id="btn-close-leaderboard" class="btn-primary btn-lb-close">CERRAR</button>
+          <button id="btn-refresh-leaderboard" class="btn-icon btn-lb-refresh" title="Actualizar desde la nube">🔄 REFRESCAR</button>
+        </div>
       </div>
     </div>
 

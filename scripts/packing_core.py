@@ -3,7 +3,7 @@ import json
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-BASE_DIR = r'd:\PROYECTOS_PERSONALES\ir_challenge'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS_DIR = os.path.join(BASE_DIR, 'assets')
 OUT_DIR = ASSETS_DIR
 FRIDGES_DIR = os.path.join(ASSETS_DIR, 'fridges')
@@ -14,7 +14,7 @@ CUTOUT_DIRS = [
     os.path.join(ASSETS_DIR, 'cutouts', 'beverages'),
     os.path.join(ASSETS_DIR, 'cutouts', 'parody'),
     os.path.join(ASSETS_DIR, 'cutouts', 'groceries'),
-    os.path.join(BASE_DIR, 'assets_transparent')
+    os.path.join(ASSETS_DIR, 'archive', 'assets_transparent')
 ]
 
 WIDTH = 1200

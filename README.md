@@ -28,12 +28,14 @@ Un simulador interactivo tipo arcade corporativo diseñado para entrenar la agud
   - `Vision Operator` (Nivel auditor profesional).
   - `Sharp Observer` (Nivel intermedio).
   - `Shelf Scanner` (Nivel inicial).
+- **Cuenta Regresiva de 3 Segundos de Preparación (3... 2... 1... ¡AUDITA!):** Overlay neobrutalista previo a cada ronda que permite al auditor leer con calma la misión, objetivos y advertencias de distractores sin consumir el cronómetro de auditoría. Incluye ticks de audio rítmicos, animación pop, tono de inicio y atajo de salto instantáneo (`Espacio` o botón `SALTAR ⏩`).
+- **Leaderboard Top 10 Global y Local:** Sistema de ranking neobrutalista con persistencia de nombre de auditor (`localStorage`), ordenamiento multidimensional (Puntos, Precisión, Recall), insignias de podio (oro, plata, bronce), etiquetas de rango CV, resaltado visual de la partida en curso y arquitectura lista para persistencia global en tiempo real mediante Cloudflare Workers (`server/`).
 - **Audio Arcade Completo & Soundtrack Playlist Dinámico:**
   - **Soundtrack Multi-Track:** Selector de canciones y playlist integrada con 2 pistas completas:
     1. *Track 1: Final Boss Battle* (Pista de batalla de jefe arcade).
     2. *Track 2: Playful Retro Arcade* (Pista retro arcade alegre y dinámica).
   - **Controles de Audio:** Botón de reproducción/pausa (`btn-music` `🎵`/`⏸️`), botón para pasar de canción (`btn-music-next` `⏭️`) y badge Neobrutalista interactivo (`music-track-title`) para alternar temas en cualquier momento.
-  - **Efectos de sonido tácticos:** Síntesis Web Audio API procedural nativa para aciertos (+100), errores (−50), ticks de tiempo y fanfarria final con botón de silenciar independiente (`btn-sound` con ícono `🔊` / `🔇`).
+  - **Efectos de sonido tácticos:** Síntesis Web Audio API procedural nativa para aciertos (+100), errores (−50), ticks de cuenta regresiva, tono de arranque ¡AUDITA! y fanfarria final con botón de silenciar independiente (`btn-sound` con ícono `🔊` / `🔇`).
 
 ---
 

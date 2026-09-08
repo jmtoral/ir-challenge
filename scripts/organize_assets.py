@@ -1,7 +1,7 @@
 import os
 import shutil
 
-BASE_DIR = r'd:\PROYECTOS_PERSONALES\ir_challenge'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS_DIR = os.path.join(BASE_DIR, 'assets')
 
 RAW_SRC = os.path.join(BASE_DIR, 'asset_ir_challenge')

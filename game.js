@@ -6,7 +6,188 @@
 (function () {
   'use strict';
 
-  // --- AUDIO SYNTHESIS (Web Audio API) ---
+  // --- CONFIGURACIÓN & LEADERBOARD CLOUD ---
+  const CONFIG = {
+    leaderboard: {
+      maxEntries: 10,
+      apiUrl: '' // Coloca aquí la URL pública de tu Cloudflare Worker una vez desplegado
+    }
+  };
+  const LB_STORAGE_KEY = 'ir_challenge_leaderboard_v1';
+  const PLAYER_NAME_KEY = 'ir_challenge_player_name';
+
+  // Seed data inicial offline (Top 5 inicial)
+  const DEFAULT_LEADERBOARD = [
+    { nombre: 'Master Auditor', puntos: 1950, precision: 100.0, recall: 100.0, accuracy: 100.0, rango: 'Human Vision Engine', fecha: '2026-09-01' },
+    { nombre: 'Cyber Spotter', puntos: 1720, precision: 95.0, recall: 90.0, accuracy: 88.5, rango: 'Vision Operator', fecha: '2026-09-02' },
+    { nombre: 'Tiendita Pro', puntos: 1480, precision: 88.0, recall: 85.0, accuracy: 80.0, rango: 'Sharp Observer', fecha: '2026-09-03' },
+    { nombre: 'Cooler Scout', puntos: 1100, precision: 82.5, recall: 78.0, accuracy: 75.0, rango: 'Sharp Observer', fecha: '2026-09-04' },
+    { nombre: 'Shelf Trainee', puntos: 750, precision: 72.0, recall: 65.0, accuracy: 60.0, rango: 'Shelf Scanner', fecha: '2026-09-05' }
+  ];
+
+  // --- LEADERBOARD LOGIC & CLOUD SYNC ---
+  function getLocalLeaderboard() {
+    try {
+      const stored = localStorage.getItem(LB_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Error leyendo leaderboard local:', e);
+    }
+    return [...DEFAULT_LEADERBOARD];
+  }
+
+  function saveLocalLeaderboard(list) {
+    try {
+      localStorage.setItem(LB_STORAGE_KEY, JSON.stringify(list.slice(0, 50)));
+    } catch (e) {
+      console.warn('Error guardando leaderboard local:', e);
+    }
+  }
+
+  async function fetchCloudLeaderboard() {
+    if (!CONFIG.leaderboard.apiUrl) return null;
+    try {
+      const url = CONFIG.leaderboard.apiUrl.replace(/\/$/, '') + '/api/leaderboard';
+      const resp = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      if (Array.isArray(data)) {
+        saveLocalLeaderboard(data);
+        return data;
+      }
+    } catch (err) {
+      console.warn('Cloudflare Leaderboard offline o inalcanzable:', err);
+    }
+    return null;
+  }
+
+  async function submitScoreToLeaderboard(entry) {
+    const list = getLocalLeaderboard();
+    list.push(entry);
+    list.sort((a, b) => {
+      if ((b.puntos || 0) !== (a.puntos || 0)) return (b.puntos || 0) - (a.puntos || 0);
+      if ((b.precision || 0) !== (a.precision || 0)) return (b.precision || 0) - (a.precision || 0);
+      return (b.recall || 0) - (a.recall || 0);
+    });
+    const top = list.slice(0, 50);
+    saveLocalLeaderboard(top);
+
+    if (CONFIG.leaderboard.apiUrl) {
+      try {
+        const url = CONFIG.leaderboard.apiUrl.replace(/\/$/, '') + '/api/score';
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            nombre: entry.nombre,
+            puntos: entry.puntos,
+            precision: entry.precision,
+            recall: entry.recall,
+            accuracy: entry.accuracy,
+            rango: entry.rango,
+            fecha: entry.fecha
+          })
+        });
+        if (resp.ok) {
+          const cloudTop = await resp.json();
+          if (Array.isArray(cloudTop)) {
+            const mapped = cloudTop.map(item => {
+              if (item.nombre === entry.nombre && item.puntos === entry.puntos) {
+                return { ...item, _fresh: true };
+              }
+              return item;
+            });
+            saveLocalLeaderboard(mapped);
+            return mapped;
+          }
+        }
+      } catch (err) {
+        console.warn('Error enviando puntaje a Cloudflare Worker:', err);
+      }
+    }
+    return top;
+  }
+
+  function renderLeaderboard(containerId, highlightName, statusElementId) {
+    const container = $(containerId);
+    if (!container) return;
+
+    const list = getLocalLeaderboard().slice(0, CONFIG.leaderboard.maxEntries);
+    const isCloudConfigured = Boolean(CONFIG.leaderboard.apiUrl);
+
+    if (statusElementId) {
+      const statusEl = $(statusElementId);
+      if (statusEl) {
+        if (isCloudConfigured) {
+          statusEl.textContent = '🟢 CLOUD SYNC';
+          statusEl.className = 'lb-status-pill is-online';
+        } else {
+          statusEl.textContent = '🟡 OFFLINE / LOCAL';
+          statusEl.className = 'lb-status-pill is-offline';
+        }
+      }
+    }
+
+    let html = `
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th class="lb-pos">#</th>
+            <th>AUDITOR</th>
+            <th>SCORE</th>
+            <th>PRECISION</th>
+            <th>RANGO</th>
+            <th>FECHA</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    list.forEach((item, index) => {
+      const pos = index + 1;
+      const isFresh = Boolean(item._fresh);
+      const isMe = highlightName && String(item.nombre).toLowerCase() === String(highlightName).toLowerCase();
+      const rowClass = isFresh ? 'lb-row-fresh' : (isMe ? 'lb-row-me' : '');
+
+      let posBadgeClass = '';
+      if (pos === 1) posBadgeClass = 'lb-pos-1';
+      else if (pos === 2) posBadgeClass = 'lb-pos-2';
+      else if (pos === 3) posBadgeClass = 'lb-pos-3';
+
+      let rankClass = 'lb-rank-scanner';
+      if (item.rango === 'Human Vision Engine') rankClass = 'lb-rank-engine';
+      else if (item.rango === 'Vision Operator') rankClass = 'lb-rank-operator';
+      else if (item.rango === 'Sharp Observer') rankClass = 'lb-rank-observer';
+
+      html += `
+        <tr class="${rowClass}">
+          <td class="lb-pos">
+            <span class="lb-pos-badge ${posBadgeClass}">${pos}</span>
+          </td>
+          <td><strong>${escapeHtml(item.nombre)}</strong></td>
+          <td><span class="lb-score-val">${item.puntos}</span></td>
+          <td>${(item.precision !== undefined ? Number(item.precision).toFixed(1) : '—')}%</td>
+          <td><span class="lb-rank-tag ${rankClass}">${escapeHtml(item.rango || 'Scanner')}</span></td>
+          <td style="color:#666; font-size:0.75rem;">${escapeHtml(item.fecha || '')}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+        </tbody>
+      </table>
+    `;
+
+    container.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
   class SoundEngine {
     constructor() {
       this.ctx = null;
@@ -92,6 +273,22 @@
       osc.stop(now + 0.06);
     }
 
+    playGo() {
+      if (!this.enabled || !this.ctx) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1046.5, now);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    }
+
     playWin() {
       if (!this.enabled || !this.ctx) return;
       this.init();
@@ -121,14 +318,14 @@
       name: 'TRACK 1: BOSS',
       fullName: 'Final Boss Battle',
       src: 'assets/audio/final_boss_battle.mp3',
-      fallback: 'Final Boss Battle Version.mp3'
+      fallback: 'assets/audio/final_boss_battle.mp3'
     },
     {
       id: 'arcade',
       name: 'TRACK 2: ARCADE',
       fullName: 'Playful Retro Arcade',
       src: 'assets/audio/playful_retro_arcade.mp3',
-      fallback: 'Playful Retro Arcade Theme.mp3'
+      fallback: 'assets/audio/playful_retro_arcade.mp3'
     }
   ];
 
@@ -214,6 +411,8 @@
     timerMax: 10.0,
     timerInterval: null,
     isPlaying: false,
+    countdownTimerId: null,
+    isCountdownActive: false,
     score: 0,
     roundScore: 0,
     tp: 0,
@@ -251,9 +450,25 @@
     fridgeImg: $('fridge-img'),
     hotspotsOverlay: $('hotspots-overlay'),
     feedbackOverlay: $('feedback-overlay'),
+    // Countdown Overlay Elements
+    countdownOverlay: $('countdown-overlay'),
+    countdownRoundBadge: $('countdown-round-badge'),
+    countdownMissionTitle: $('countdown-mission-title'),
+    countdownMissionDesc: $('countdown-mission-desc'),
+    countdownTimerCircle: $('countdown-timer-circle'),
+    countdownNumber: $('countdown-number'),
+    btnSkipCountdown: $('btn-skip-countdown'),
     // Modals
     modalStart: $('modal-start'),
+    inputPlayerName: $('input-player-name'),
+    btnViewLbStart: $('btn-view-lb-start'),
     btnStartGame: $('btn-start-game'),
+    btnLeaderboardNav: $('btn-leaderboard-nav'),
+    modalLeaderboard: $('modal-leaderboard'),
+    modalLbStatus: $('modal-lb-status'),
+    globalLbContainer: $('global-leaderboard-container'),
+    btnCloseLeaderboard: $('btn-close-leaderboard'),
+    btnRefreshLeaderboard: $('btn-refresh-leaderboard'),
     modalRoundResults: $('modal-round-results'),
     roundResultBadge: $('round-result-badge'),
     roundResultTitle: $('round-result-title'),
@@ -274,6 +489,8 @@
     finalRecall: $('final-recall'),
     finalAccuracy: $('final-accuracy'),
     finalTotalScore: $('final-total-score'),
+    benchmarkLbContainer: $('benchmark-leaderboard-container'),
+    benchmarkLbStatus: $('benchmark-lb-status'),
     btnPlayAgain: $('btn-play-again')
   };
 
@@ -286,6 +503,19 @@
       state.rounds = [data.round1, data.round2, data.round3, data.round4];
     } catch (err) {
       console.error('Error cargando datos:', err);
+    }
+
+    // Cargar nombre de auditor previo si existe
+    try {
+      const savedName = localStorage.getItem(PLAYER_NAME_KEY);
+      if (savedName && el.inputPlayerName) {
+        el.inputPlayerName.value = savedName;
+      }
+    } catch (e) {}
+
+    // Sincronización en la nube si hay API configurada
+    if (CONFIG.leaderboard.apiUrl) {
+      fetchCloudLeaderboard().catch(() => {});
     }
 
     updateMusicTrackDisplay(music.currentTrack);
@@ -313,6 +543,54 @@
   }
 
   function setupEventListeners() {
+    // Guardar nombre al escribir
+    if (el.inputPlayerName) {
+      el.inputPlayerName.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val) {
+          try { localStorage.setItem(PLAYER_NAME_KEY, val); } catch (err) {}
+        }
+      });
+    }
+
+    // Modal Leaderboard (apertura y cierre)
+    function openLeaderboardModal() {
+      audio.init();
+      if (!el.modalLeaderboard) return;
+      const curName = el.inputPlayerName ? el.inputPlayerName.value.trim() : '';
+      renderLeaderboard('global-leaderboard-container', curName, 'modal-lb-status');
+      el.modalLeaderboard.classList.remove('hidden');
+
+      if (CONFIG.leaderboard.apiUrl) {
+        fetchCloudLeaderboard().then(() => {
+          renderLeaderboard('global-leaderboard-container', curName, 'modal-lb-status');
+        });
+      }
+    }
+
+    if (el.btnLeaderboardNav) {
+      el.btnLeaderboardNav.addEventListener('click', openLeaderboardModal);
+    }
+    if (el.btnViewLbStart) {
+      el.btnViewLbStart.addEventListener('click', openLeaderboardModal);
+    }
+    if (el.btnCloseLeaderboard) {
+      el.btnCloseLeaderboard.addEventListener('click', () => {
+        audio.init();
+        if (el.modalLeaderboard) el.modalLeaderboard.classList.add('hidden');
+      });
+    }
+    if (el.btnRefreshLeaderboard) {
+      el.btnRefreshLeaderboard.addEventListener('click', async () => {
+        audio.init();
+        const curName = el.inputPlayerName ? el.inputPlayerName.value.trim() : '';
+        if (CONFIG.leaderboard.apiUrl) {
+          await fetchCloudLeaderboard();
+        }
+        renderLeaderboard('global-leaderboard-container', curName, 'modal-lb-status');
+      });
+    }
+
     el.btnMusic.addEventListener('click', () => {
       audio.init();
       const isPlaying = music.toggle();
@@ -380,6 +658,23 @@
       startRound(0);
     });
 
+    if (el.btnSkipCountdown) {
+      el.btnSkipCountdown.addEventListener('click', () => {
+        audio.init();
+        if (state.isCountdownActive) {
+          finishCountdownAndStart();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && state.isCountdownActive) {
+        e.preventDefault();
+        audio.init();
+        finishCountdownAndStart();
+      }
+    });
+
     // Desbloquear audio e iniciar música en primera interacción de usuario
     document.addEventListener('click', () => {
       audio.init();
@@ -392,6 +687,14 @@
 
   function resetGame() {
     clearInterval(state.timerInterval);
+    if (state.countdownTimerId) {
+      clearTimeout(state.countdownTimerId);
+      state.countdownTimerId = null;
+    }
+    state.isCountdownActive = false;
+    if (el.countdownOverlay) {
+      el.countdownOverlay.classList.add('hidden');
+    }
     state.currentRoundIndex = 0;
     state.score = 0;
     state.history = [];
@@ -399,8 +702,14 @@
     updateSidebarUI();
   }
 
-  // --- START ROUND ---
+  // --- START ROUND WITH 3-SECOND PREPARATION COUNTDOWN ---
   function startRound(roundIdx) {
+    clearInterval(state.timerInterval);
+    if (state.countdownTimerId) {
+      clearTimeout(state.countdownTimerId);
+      state.countdownTimerId = null;
+    }
+
     state.currentRoundIndex = roundIdx;
     state.roundData = state.rounds[roundIdx];
     state.timeRemaining = state.roundData.time;
@@ -412,16 +721,103 @@
     state.totalFound = 0;
     state.foundIndices.clear();
     state.totalTargets = state.roundData.target_count;
-    state.isPlaying = true;
+    state.isPlaying = false; // Hotspots bloqueados durante la lectura de instrucciones
+    state.isCountdownActive = true;
 
-    // Preload image & build hotspots
+    // Precargar imagen y construir hotspots (invisibles y bloqueados)
     el.fridgeImg.src = state.roundData.image;
     renderHotspots();
     updateSidebarUI();
 
-    // Start timer loop
+    // Actualizar datos en overlay de preparación
+    if (el.countdownRoundBadge) {
+      el.countdownRoundBadge.textContent = `RONDA ${roundIdx + 1} DE ${state.rounds.length} // PREPARACIÓN`;
+    }
+    if (el.countdownMissionTitle) {
+      el.countdownMissionTitle.textContent = state.roundData.mission;
+    }
+    if (el.countdownMissionDesc) {
+      el.countdownMissionDesc.textContent = state.roundData.subtext || 'Identifica rápidamente los objetivos de catálogo requeridos.';
+    }
+
+    // Resetear estilos del círculo de cuenta
+    if (el.countdownTimerCircle) {
+      el.countdownTimerCircle.classList.remove('is-go');
+    }
+    if (el.countdownNumber) {
+      el.countdownNumber.classList.remove('is-go-text');
+      el.countdownNumber.textContent = '3';
+    }
+
+    if (el.countdownOverlay) {
+      el.countdownOverlay.classList.remove('hidden');
+    }
+
+    // Segundo 3
+    audio.playTick();
+    triggerCountdownPop();
+
+    // Segundo 2 (tras 1000ms)
+    state.countdownTimerId = setTimeout(() => {
+      if (!state.isCountdownActive) return;
+      if (el.countdownNumber) el.countdownNumber.textContent = '2';
+      audio.playTick();
+      triggerCountdownPop();
+
+      // Segundo 1 (tras 2000ms)
+      state.countdownTimerId = setTimeout(() => {
+        if (!state.isCountdownActive) return;
+        if (el.countdownNumber) el.countdownNumber.textContent = '1';
+        audio.playTick();
+        triggerCountdownPop();
+
+        // ¡AUDITA! (tras 3000ms)
+        state.countdownTimerId = setTimeout(() => {
+          if (!state.isCountdownActive) return;
+          if (el.countdownNumber) {
+            el.countdownNumber.textContent = '¡AUDITA!';
+            el.countdownNumber.classList.add('is-go-text');
+          }
+          if (el.countdownTimerCircle) {
+            el.countdownTimerCircle.classList.add('is-go');
+          }
+          audio.playGo();
+          triggerCountdownPop();
+
+          // Transición suave al juego activo (350ms de flash de ¡AUDITA!)
+          state.countdownTimerId = setTimeout(() => {
+            finishCountdownAndStart();
+          }, 350);
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  }
+
+  function triggerCountdownPop() {
+    if (!el.countdownNumber) return;
+    el.countdownNumber.classList.remove('pop-anim');
+    void el.countdownNumber.offsetWidth; // Forzar reflujo CSS
+    el.countdownNumber.classList.add('pop-anim');
+  }
+
+  function finishCountdownAndStart() {
+    if (state.countdownTimerId) {
+      clearTimeout(state.countdownTimerId);
+      state.countdownTimerId = null;
+    }
+    state.isCountdownActive = false;
+    if (el.countdownOverlay) {
+      el.countdownOverlay.classList.add('hidden');
+    }
+    beginActiveTimer();
+  }
+
+  function beginActiveTimer() {
+    state.isPlaying = true;
+
+    // Iniciar bucle de cronómetro de ronda
     clearInterval(state.timerInterval);
-    const stepMs = 50; // 20 updates per second for smooth bar
+    const stepMs = 50; // 20 actualizaciones por segundo
     let lastTickSecond = Math.ceil(state.timeRemaining);
 
     state.timerInterval = setInterval(() => {
@@ -430,7 +826,7 @@
       state.timeRemaining = Math.max(0, state.timeRemaining - (stepMs / 1000));
       updateTimerUI();
 
-      // Audio tick during last 3 seconds
+      // Ticks de audio en los últimos 3 segundos
       const currentSec = Math.ceil(state.timeRemaining);
       if (currentSec <= 3 && currentSec > 0 && currentSec !== lastTickSecond) {
         audio.playTick();
@@ -681,6 +1077,32 @@
 
     el.finalRankTitle.textContent = rankTitle;
     el.finalRankDesc.textContent = rankDesc;
+
+    // Registrar en Leaderboard y renderizar
+    const rawName = el.inputPlayerName ? el.inputPlayerName.value.trim() : '';
+    const playerName = rawName || 'Auditor Pop';
+    try {
+      localStorage.setItem(PLAYER_NAME_KEY, playerName);
+    } catch (e) {}
+
+    const scoreEntry = {
+      nombre: playerName,
+      puntos: state.score,
+      precision: parseFloat(globalPrecision.toFixed(1)),
+      recall: parseFloat(globalRecall.toFixed(1)),
+      accuracy: parseFloat(globalAccuracy.toFixed(1)),
+      rango: rankTitle,
+      fecha: new Date().toISOString().slice(0, 10),
+      _fresh: true
+    };
+
+    // Render inmediato local
+    renderLeaderboard('benchmark-leaderboard-container', playerName, 'benchmark-lb-status');
+
+    // Enviar a la nube y actualizar
+    submitScoreToLeaderboard(scoreEntry).then(() => {
+      renderLeaderboard('benchmark-leaderboard-container', playerName, 'benchmark-lb-status');
+    });
 
     el.modalFinalBenchmark.classList.remove('hidden');
     audio.playWin();

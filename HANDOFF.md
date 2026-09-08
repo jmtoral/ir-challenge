@@ -752,6 +752,60 @@
 - `README.md` y `CLAUDE.md` — documentación de la playlist y controles de audio.
 - `HANDOFF.md` — esta entrada (Entrada 15).
 
+---
+
+### Entrada 16 — 2026-09-07 — Reorganización del Root, Cuenta Regresiva de 3s de Preparación y Consolidación del Leaderboard
+
+**Quién:** agente (Gemini 3.8 Flash Thinking), a petición del usuario
+
+#### Qué se hizo
+- **1. Reorganización y Limpieza Integral del Directorio Raíz (`root`)**:
+  - Se creó el directorio dedicado `scripts/` y se trasladaron los 5 scripts generadores de Computer Vision y procesamiento: `scripts/build_fridges.py`, `scripts/packing_core.py`, `scripts/fix_distractors_grabcut.py`, `scripts/process_distractors.py` y `scripts/organize_assets.py`.
+  - Se actualizó `scripts/packing_core.py`, `scripts/build_fridges.py` y `scripts/organize_assets.py` para resolver dinámicamente la ruta raíz (`BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))`), eliminando rutas absolutas codificadas en duro.
+  - Se eliminaron del root los archivos duplicados redundantes: `Final Boss Battle Version.mp3`, `Playful Retro Arcade Theme.mp3` (catalogados en `assets/audio/`) y `coca3.JPG` (catalogado en `assets/raw/coca3.jpg`).
+  - Se trasladaron las carpetas de recursos crudos heredadas (`asset_ir_challenge/` y `assets_transparent/`) a `assets/archive/` mediante `git mv` para preservar el historial sin duplicación ni desorden en la raíz.
+  - Se limpiaron los directorios `__pycache__/`.
+- **2. Sistema de Cuenta Regresiva de 3 Segundos (3... 2... 1... ¡AUDITA!)**:
+  - Se diseñó e implementó el overlay neobrutalista `#countdown-overlay` sobre el refrigerador comercial en `index.html` y `style.css`.
+  - Presenta:
+    - Badge superior: `RONDA X DE 4 // PREPARACIÓN`.
+    - Recuadro de Misión: Misión destacada y descripción detallada de objetivos/distractores a ignorar.
+    - Círculo de cuenta animado (`3` -> `2` -> `1` -> `¡AUDITA!`) con animación pop por reflujo (`@keyframes countdownPop`).
+    - Audio cues rítmicos: `audio.playTick()` en cada segundo y nuevo sintetizador `audio.playGo()` (onda triangular a 1046.5 Hz) al grito de *¡AUDITA!*.
+    - Botón y atajo rápido: `#btn-skip-countdown` y tecla `Espacio` para inicio instantáneo sin espera.
+  - Lógica en `game.js`: Durante la cuenta regresiva los hotspots están bloqueados (evita clics accidentales o prematuros) y el cronómetro de la ronda permanece congelado al 100%, activándose únicamente al terminar la cuenta.
+- **3. Consolidación y Verificación del Leaderboard Top 10**:
+  - Se corrigió la estructura HTML en `index.html`, cerrando la etiqueta `.round-preview-grid` que rompía la anidación del modal inicial.
+  - Se vinculó el campo de nombre de auditor con `localStorage` (`ir_challenge_player_name`).
+  - Se integró el botón `🏆 RANKING` en el modal de inicio, en la barra de navegación superior y en la pantalla de Human Benchmark final.
+  - Se implementó la clase `.lb-row-me` en `style.css` para resaltar las puntuaciones propias del jugador en azul neobrutalista, conviviendo con `.lb-row-fresh` en amarillo pulsante.
+  - Se verificó la compatibilidad dual: persistencia local inmediata mediante `localStorage` y soporte en la nube con Cloudflare Workers (`server/worker.js`).
+- **4. Verificación Automatizada en Navegador**:
+  - Se ejecutó el servidor web local y se realizó verificación mediante `browser_subagent` en `http://localhost:8080/`.
+  - Se validó el inicio de sesión, la visualización y cierre del Leaderboard, la aparición del overlay de 3 segundos con la misión e instrucciones, la transición a juego activo y el funcionamiento del cronómetro.
+  - Se capturaron screenshots de los 4 estados principales.
+
+#### Qué se decidió y por qué
+- **Decisión:** Mover scripts generadores a `scripts/` y assets fuente a `assets/archive/`.
+  **Razón:** El directorio raíz queda exclusivamente reservado para los archivos de entrega web y documentación, logrando una estructura limpia, clara y profesional.
+- **Decisión:** Pausar el cronómetro de la ronda durante los 3 segundos de preparación y bloquear la interactividad de hotspots.
+  **Razón:** Resuelve de manera directa el feedback del usuario: permite al auditor leer y procesar la misión antes de ser sometido al estrés del tiempo de Computer Vision.
+- **Decisión:** Añadir atajo de salto instantáneo (`Espacio` o botón `SALTAR ⏩`).
+  **Razón:** Respeta a los jugadores experimentados que ya conocen las misiones y desean jugar a máxima velocidad.
+
+#### Qué quedó pendiente
+- Ninguno. Todos los requerimientos fueron completados, ordenados y validados.
+
+#### Archivos tocados
+- `index.html` — corrección de anidación del modal inicial, inclusión de `#countdown-overlay` y botones de leaderboard.
+- `style.css` — estilos del overlay de cuenta regresiva de 3s, animación pop y clase `.lb-row-me`.
+- `game.js` — flujo de cuenta regresiva, `playGo()` en `SoundEngine`, bloqueo de clics pre-ronda y enlaces de leaderboard.
+- `scripts/build_fridges.py`, `scripts/packing_core.py`, `scripts/organize_assets.py` — rutas relativas portables.
+- `assets/archive/` — archivo histórico de assets crudos.
+- `README.md` y `CLAUDE.md` — actualización de árbol de directorios y nuevas características.
+- `HANDOFF.md` — esta entrada (Entrada 16).
+
+
 
 
 
