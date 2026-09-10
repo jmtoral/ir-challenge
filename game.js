@@ -6,75 +6,60 @@
 (function () {
   'use strict';
 
-  // --- CONFIGURACIÓN & LEADERBOARD CLOUD ---
+  // --- CONFIGURACIÓN & LEADERBOARD GLOBAL CLOUD ---
   const CONFIG = {
     leaderboard: {
       maxEntries: 10,
-      apiUrl: '' // Coloca aquí la URL pública de tu Cloudflare Worker una vez desplegado
+      apiUrl: 'https://ir-challenge-leaderboard.jmtoralcruz.workers.dev'
     }
   };
   const LB_STORAGE_KEY = 'ir_challenge_leaderboard_v1';
   const PLAYER_NAME_KEY = 'ir_challenge_player_name';
 
-  // Seed data inicial offline (Top 5 inicial)
-  const DEFAULT_LEADERBOARD = [
-    { nombre: 'Master Auditor', puntos: 1950, precision: 100.0, recall: 100.0, accuracy: 100.0, rango: 'Human Vision Engine', fecha: '2026-09-01' },
-    { nombre: 'Cyber Spotter', puntos: 1720, precision: 95.0, recall: 90.0, accuracy: 88.5, rango: 'Vision Operator', fecha: '2026-09-02' },
-    { nombre: 'Tiendita Pro', puntos: 1480, precision: 88.0, recall: 85.0, accuracy: 80.0, rango: 'Sharp Observer', fecha: '2026-09-03' },
-    { nombre: 'Cooler Scout', puntos: 1100, precision: 82.5, recall: 78.0, accuracy: 75.0, rango: 'Sharp Observer', fecha: '2026-09-04' },
-    { nombre: 'Shelf Trainee', puntos: 750, precision: 72.0, recall: 65.0, accuracy: 60.0, rango: 'Shelf Scanner', fecha: '2026-09-05' }
-  ];
+  // Caché en memoria para datos globales sincronizados
+  let globalLeaderboardCache = [];
 
   // --- LEADERBOARD LOGIC & CLOUD SYNC ---
-  function getLocalLeaderboard() {
+  function getCachedLeaderboard() {
+    if (globalLeaderboardCache.length > 0) return globalLeaderboardCache;
     try {
       const stored = localStorage.getItem(LB_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          globalLeaderboardCache = parsed;
+          return parsed;
+        }
       }
-    } catch (e) {
-      console.warn('Error leyendo leaderboard local:', e);
-    }
-    return [...DEFAULT_LEADERBOARD];
+    } catch (e) {}
+    return [];
   }
 
-  function saveLocalLeaderboard(list) {
+  function saveCachedLeaderboard(list) {
+    globalLeaderboardCache = list;
     try {
       localStorage.setItem(LB_STORAGE_KEY, JSON.stringify(list.slice(0, 50)));
-    } catch (e) {
-      console.warn('Error guardando leaderboard local:', e);
-    }
+    } catch (e) {}
   }
 
   async function fetchCloudLeaderboard() {
-    if (!CONFIG.leaderboard.apiUrl) return null;
+    if (!CONFIG.leaderboard.apiUrl) return [];
     try {
       const url = CONFIG.leaderboard.apiUrl.replace(/\/$/, '') + '/api/leaderboard';
       const resp = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
       if (Array.isArray(data)) {
-        saveLocalLeaderboard(data);
+        saveCachedLeaderboard(data);
         return data;
       }
     } catch (err) {
-      console.warn('Cloudflare Leaderboard offline o inalcanzable:', err);
+      console.warn('Error sincronizando Leaderboard global:', err);
     }
-    return null;
+    return getCachedLeaderboard();
   }
 
   async function submitScoreToLeaderboard(entry) {
-    const list = getLocalLeaderboard();
-    list.push(entry);
-    list.sort((a, b) => {
-      if ((b.puntos || 0) !== (a.puntos || 0)) return (b.puntos || 0) - (a.puntos || 0);
-      if ((b.precision || 0) !== (a.precision || 0)) return (b.precision || 0) - (a.precision || 0);
-      return (b.recall || 0) - (a.recall || 0);
-    });
-    const top = list.slice(0, 50);
-    saveLocalLeaderboard(top);
-
     if (CONFIG.leaderboard.apiUrl) {
       try {
         const url = CONFIG.leaderboard.apiUrl.replace(/\/$/, '') + '/api/score';
@@ -100,14 +85,23 @@
               }
               return item;
             });
-            saveLocalLeaderboard(mapped);
+            saveCachedLeaderboard(mapped);
             return mapped;
           }
         }
       } catch (err) {
-        console.warn('Error enviando puntaje a Cloudflare Worker:', err);
+        console.warn('Error enviando puntaje al Leaderboard global:', err);
       }
     }
+    const list = getCachedLeaderboard();
+    list.push(entry);
+    list.sort((a, b) => {
+      if ((b.puntos || 0) !== (a.puntos || 0)) return (b.puntos || 0) - (a.puntos || 0);
+      if ((b.precision || 0) !== (a.precision || 0)) return (b.precision || 0) - (a.precision || 0);
+      return (b.recall || 0) - (a.recall || 0);
+    });
+    const top = list.slice(0, 50);
+    saveCachedLeaderboard(top);
     return top;
   }
 
@@ -115,19 +109,13 @@
     const container = $(containerId);
     if (!container) return;
 
-    const list = getLocalLeaderboard().slice(0, CONFIG.leaderboard.maxEntries);
-    const isCloudConfigured = Boolean(CONFIG.leaderboard.apiUrl);
+    const list = getCachedLeaderboard().slice(0, CONFIG.leaderboard.maxEntries);
 
     if (statusElementId) {
       const statusEl = $(statusElementId);
       if (statusEl) {
-        if (isCloudConfigured) {
-          statusEl.textContent = '🟢 CLOUD SYNC';
-          statusEl.className = 'lb-status-pill is-online';
-        } else {
-          statusEl.textContent = '🟡 OFFLINE / LOCAL';
-          statusEl.className = 'lb-status-pill is-offline';
-        }
+        statusEl.textContent = '🟢 GLOBAL RANKING';
+        statusEl.className = 'lb-status-pill is-online';
       }
     }
 
@@ -146,35 +134,46 @@
         <tbody>
     `;
 
-    list.forEach((item, index) => {
-      const pos = index + 1;
-      const isFresh = Boolean(item._fresh);
-      const isMe = highlightName && String(item.nombre).toLowerCase() === String(highlightName).toLowerCase();
-      const rowClass = isFresh ? 'lb-row-fresh' : (isMe ? 'lb-row-me' : '');
-
-      let posBadgeClass = '';
-      if (pos === 1) posBadgeClass = 'lb-pos-1';
-      else if (pos === 2) posBadgeClass = 'lb-pos-2';
-      else if (pos === 3) posBadgeClass = 'lb-pos-3';
-
-      let rankClass = 'lb-rank-scanner';
-      if (item.rango === 'Human Vision Engine') rankClass = 'lb-rank-engine';
-      else if (item.rango === 'Vision Operator') rankClass = 'lb-rank-operator';
-      else if (item.rango === 'Sharp Observer') rankClass = 'lb-rank-observer';
-
+    if (list.length === 0) {
       html += `
-        <tr class="${rowClass}">
-          <td class="lb-pos">
-            <span class="lb-pos-badge ${posBadgeClass}">${pos}</span>
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 24px 12px; font-weight: 700; color: #666;">
+            🌐 Aún no hay puntuaciones en el ranking global.<br>
+            <span style="font-size: 0.76rem; color: #888;">¡Completa la auditoría para inscribir tu récord en la nube!</span>
           </td>
-          <td><strong>${escapeHtml(item.nombre)}</strong></td>
-          <td><span class="lb-score-val">${item.puntos}</span></td>
-          <td>${(item.precision !== undefined ? Number(item.precision).toFixed(1) : '—')}%</td>
-          <td><span class="lb-rank-tag ${rankClass}">${escapeHtml(item.rango || 'Scanner')}</span></td>
-          <td style="color:#666; font-size:0.75rem;">${escapeHtml(item.fecha || '')}</td>
         </tr>
       `;
-    });
+    } else {
+      list.forEach((item, index) => {
+        const pos = index + 1;
+        const isFresh = Boolean(item._fresh);
+        const isMe = highlightName && String(item.nombre).toLowerCase() === String(highlightName).toLowerCase();
+        const rowClass = isFresh ? 'lb-row-fresh' : (isMe ? 'lb-row-me' : '');
+
+        let posBadgeClass = '';
+        if (pos === 1) posBadgeClass = 'lb-pos-1';
+        else if (pos === 2) posBadgeClass = 'lb-pos-2';
+        else if (pos === 3) posBadgeClass = 'lb-pos-3';
+
+        let rankClass = 'lb-rank-scanner';
+        if (item.rango === 'Human Vision Engine') rankClass = 'lb-rank-engine';
+        else if (item.rango === 'Vision Operator') rankClass = 'lb-rank-operator';
+        else if (item.rango === 'Sharp Observer') rankClass = 'lb-rank-observer';
+
+        html += `
+          <tr class="${rowClass}">
+            <td class="lb-pos">
+              <span class="lb-pos-badge ${posBadgeClass}">${pos}</span>
+            </td>
+            <td><strong>${escapeHtml(item.nombre)}</strong></td>
+            <td><span class="lb-score-val">${item.puntos}</span></td>
+            <td>${(item.precision !== undefined ? Number(item.precision).toFixed(1) : '—')}%</td>
+            <td><span class="lb-rank-tag ${rankClass}">${escapeHtml(item.rango || 'Scanner')}</span></td>
+            <td style="color:#666; font-size:0.75rem;">${escapeHtml(item.fecha || '')}</td>
+          </tr>
+        `;
+      });
+    }
 
     html += `
         </tbody>

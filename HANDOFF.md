@@ -805,6 +805,36 @@
 - `README.md` y `CLAUDE.md` — actualización de árbol de directorios y nuevas características.
 - `HANDOFF.md` — esta entrada (Entrada 16).
 
+---
+
+### Entrada 17 — 2026-09-08 — Activación del Leaderboard Global Cloudflare y Purga del Modo Local
+
+**Quién:** agente (Gemini 3.8 Flash Thinking), a petición del usuario
+
+#### Qué se hizo
+- **1. Conexión con el Worker Global en Producción**:
+  - Se vinculó `game.js` con la URL pública en vivo del Cloudflare Worker: `https://ir-challenge-leaderboard.jmtoralcruz.workers.dev`.
+  - Se validó el endpoint `POST /api/score` y `GET /api/leaderboard` recibiendo y ordenando puntajes en tiempo real con CORS habilitado.
+- **2. Purga y Eliminación del Ranking Local**:
+  - Se eliminaron las puntuaciones falsas de prueba (`DEFAULT_LEADERBOARD`) que se mostraban por defecto en local.
+  - Se retiraron de la interfaz (`index.html` y `game.js`) las etiquetas e insignias que decían `OFFLINE / LOCAL`.
+  - El Leaderboard ahora muestra el estado oficial `🟢 GLOBAL RANKING`.
+  - Se implementó un estado vacío elegante para cuando no existan puntuaciones registradas en la nube.
+- **3. Documentación del KV Namespace para el Proyecto**:
+  - Se instruyó al usuario sobre la creación del namespace dedicado `IR_CHALLENGE_KV` en Cloudflare Storage y su vinculación (`LEADERBOARD_KV`) en el Worker de este proyecto.
+
+#### Qué se decidió y por qué
+- **Decisión:** Desechar el almacenamiento simulado local y enlazar directamente con el Cloudflare Worker desplegado por el usuario.
+  **Razón:** Cumple con la solicitud de unificar las puntuaciones de todos los jugadores de GitHub Pages en un único ranking global persistente.
+
+#### Qué quedó pendiente
+- Ninguno. El Leaderboard Global se encuentra enlazado y activo.
+
+#### Archivos tocados
+- `game.js` — configuración de `apiUrl` a producción, eliminación de datos mock locales y actualización de renderizado.
+- `index.html` — actualización de insignias a `🟢 GLOBAL`.
+- `HANDOFF.md` — esta entrada (Entrada 17).
+
 
 
 
